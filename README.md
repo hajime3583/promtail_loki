@@ -1,0 +1,2 @@
+# promtail_loki
+promtailとlokiをansibleで展開するためのモジュール
