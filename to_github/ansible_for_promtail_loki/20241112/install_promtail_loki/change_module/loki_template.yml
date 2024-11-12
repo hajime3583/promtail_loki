@@ -1,0 +1,77 @@
+auth_enabled: false
+
+server:
+  log_level: debug
+  http_listen_port: {http_listen_port}
+  grpc_listen_port: 0
+
+common:
+  path_prefix: {path_prefix} #walディレクトリはこの配下に作成される
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+
+compactor:
+  shared_store: filesystem
+  compaction_interval: 60m
+  retention_enabled: true
+  retention_delete_delay: 6307200
+  retention_delete_worker_count: 150
+
+limits_config:
+  retention_period: 1095d
+
+query_scheduler:
+  max_outstanding_requests_per_tenant: 10000
+
+frontend:
+  max_outstanding_per_tenant: 100000
+query_range:
+  align_queries_with_step: true
+  max_retries: 5
+  cache_results: true
+  results_cache:
+    cache:
+      embedded_cache:
+        enabled: true
+        max_size_mb: 500
+        ttl: 24h
+
+chunk_store_config:
+  max_look_back_period: 0s
+  chunk_cache_config:
+    embedded_cache:
+      enabled: true
+      max_size_mb: 500
+      ttl: 24h
+
+schema_config:
+  configs:
+    - from: 2022-01-01
+      store: tsdb # バックエンドとして使用するストア
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h
+
+storage_config:
+  tsdb_shipper:
+    active_index_directory: {active_index_directory}
+    cache_location: {cache_location}
+    cache_ttl: 24h
+  filesystem:
+    directory: {directory}  # lokiが生成するログチャンクのディレクトリ
+
+ingester:
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+  chunk_idle_period: 3m
+  max_chunk_age: 1h
+  chunk_retain_period: 1m
+  max_transfer_retries: 0
+
